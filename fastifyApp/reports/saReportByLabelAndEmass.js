@@ -1,31 +1,45 @@
 import * as reportGetters from './reportGetters.js';
 import * as reportUtils from './reportUtils.js';
-import promptSync from 'prompt-sync';
-import { stringify } from 'csv-stringify/sync';
-import fs from 'fs';
-import path from 'path'
+//import promptSync from 'prompt-sync';
+//import { stringify } from 'csv-stringify/sync';
+//import fs from 'fs';
+//import path from 'path'
 
-async function runSAReportByLabelAndEmass(tokens) {
+async function runSAReportByLabelAndEmass(tokens, args) {
 
     try {
 
         console.log(`runSAReportByLabelAndEmass: Requesting STIG Manager Collections`);
         //console.log(`runSAReportByLabelAndEmass Requesting STIG Manager Data for collection ` + collectionName);
 
-        const collections = await reportGetters.getCollections(tokens.access_token)
+        var collections = [];
+        var tempCollections = [];
+
+        tempCollections = await reportGetters.getCollections(tokens.access_token);
+        if (!args || args.length === 0) {
+            collections = tempCollections;
+        }
+        else {
+            var emassMap = reportUtils.getCollectionsByEmassNumber(tempCollections);
+            var emassArray = args.split(',');
+            for (var mapIdx = 0; mapIdx < emassArray.length; mapIdx++) {
+                if (emassMap.has(emassArray[mapIdx])) {
+
+                    var mappedCollection = emassMap.get(emassArray[mapIdx]);
+                    if (mappedCollection) {
+                        collections = collections.concat(mappedCollection);
+                    }
+                }
+            }
+        }
+
         //console.log(collections);
 
         var emassMap = reportUtils.getCollectionsByEmassNumber(collections);
-
-        var labels = [];
         var metrics = [];
-        let labelMap = new Map();
-
         var rows = [
             {
                 emass: 'EMASS Number',
-                collectionName: 'Collection',
-                label: 'Label',
                 asset: 'Asset',
                 assessed: 'Assessed',
                 submitted: 'Submitted',
@@ -50,40 +64,26 @@ async function runSAReportByLabelAndEmass(tokens) {
 
             for (var i = 0; i < myCollections.length; i++) {
 
-                //labelMap.clear();
-                labels.length = 0;
-                labels = await reportGetters.getLabelsByCollection(tokens.access_token, myCollections[i].collectionId);
-                //console.log("labels: " + labels);
-
-                for (var x = 0; x < labels.length; x++) {
-                    labelMap.set(labels[x].labelId, labels[x].description);
-                }
-
-                collectionNames = collectionNames + myCollections[i].name + ', ';
                 metrics = await reportGetters.getCollectionMerticsAggreatedByLabel(tokens.access_token, myCollections[i].collectionId);
                 //console.log(metrics);
                 metricsData.push(metrics);
             }
 
-            // remove trailing comma and white space
-            collectionNames = collectionNames.replace(/,\s*$/, "");
-            var myData = getRow(emassNum, metricsData, labelMap, collectionNames);
+            var myData = getRow(emassNum, metricsData);
             rows.push(myData);
             iKey++;
-            metricsData.length = 0;
-            collectionNames = '';
-            labelMap.clear();
-            
+            metricsData.length = 0;            
         }
+
+        return rows;
     }
     catch (e) {
-        console.log(e)
+        console.log(e);
+        throw(e);
     }
-
-    return rows;
 }
 
-function getRow(emassNum, metrics, labelMap, collectionNames) {
+function getRow(emassNum, metrics) {
 
     var numAssessments = 0;
     var numAssessed = 0;
@@ -94,9 +94,7 @@ function getRow(emassNum, metrics, labelMap, collectionNames) {
     var sumOfCat3 = 0;
     var sumOfCat2 = 0;
     var sumOfCat1 = 0;
-    var labelName = '';
-    var labelDesc = '';
-    var labelNames = '';
+    
     for (var i = 0; i < metrics.length; i++) {
         var myMetricsData = metrics[i];
         //console.log(myMetricsData);
@@ -113,21 +111,7 @@ function getRow(emassNum, metrics, labelMap, collectionNames) {
             numAssets += myMetricsData[j].assets;
             sumOfCat3 += myMetrics.findings.low;
             sumOfCat2 += myMetrics.findings.medium;
-            sumOfCat1 += myMetrics.findings.high;
-
-            labelName = myMetricsData[j].name;
-            labelDesc = labelMap.get(myMetricsData[j].labelId);
-            if (labelDesc) {
-                if (labelDesc.toUpperCase() === 'OWNER') {
-                    labelName += ' (O)';
-                }
-                else if (labelDesc.toUpperCase() === 'PRIMARY SA') {
-                    labelName += ' (SA)';
-                }
-
-                labelNames = labelNames + labelName + ', ';
-            }
-            
+            sumOfCat1 += myMetrics.findings.high;            
         }
     }
     
@@ -139,13 +123,8 @@ function getRow(emassNum, metrics, labelMap, collectionNames) {
     const avgAccepted = Math.round(numAssessments ? ((numAccepted) / numAssessments) * 100 : 0);
     const avgRejected = Math.round(numAssessments ? ((numRejected) / numAssessments) * 100 : 0);
 
-    // remove trailing comma and white space
-    labelNames = labelNames.replace(/,\s*$/, "");
-
     var rowData = {
         emass: emassNum,
-        collectionName: collectionNames,
-        label: labelNames,
         asset: numAssets,
         assessed: avgAssessed + '%',
         submitted: avgSubmitted + '%',

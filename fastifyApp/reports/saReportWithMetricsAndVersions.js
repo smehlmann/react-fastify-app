@@ -1,18 +1,18 @@
 import * as reportGetters from './reportGetters.js';
 import * as reportUtils from './reportUtils.js';
-import promptSync from 'prompt-sync';
-import { stringify } from 'csv-stringify/sync';
-import fs from 'fs';
-import path from 'path'
+//import promptSync from 'prompt-sync';
+//import { stringify } from 'csv-stringify/sync';
+//import fs from 'fs';
+//import path from 'path'
 
-async function runSAReportByAsset(tokens, args) {
+async function runSAReportWithMetricsAndVersions(tokens, args) {
 
     try {
 
         //const prompt = promptSync();
         //const collectionName = prompt('Enter collection name.');
 
-        console.log(`runStatusReport: Requesting STIG Manager Collections`);
+        console.log(`runSAReportWithMetricsAndVersions: Requesting STIG Manager Collections`);
         //console.log(`runStatusReport: Requesting STIG Manager Data for collection ` + collectionName);
         var collections = [];
         var tempCollections = [];
@@ -38,7 +38,7 @@ async function runSAReportByAsset(tokens, args) {
         //const collections = await reportGetters.getCollectionByName(tokens.access_token, collectionName);
 
         var metrics = [];
-        var labels= [];
+        var labels = [];
         let labelMap = new Map();
 
         var rows = [
@@ -46,11 +46,12 @@ async function runSAReportByAsset(tokens, args) {
                 collectionName: 'Collection',
                 asset: 'Asset',
                 primOwner: 'Primary Owner',
-                secOwner: 'Second Owner',
                 sysAdmin: 'Sys Admin',
-                label: 'Label',
-                stigs: 'STIGs',
-                benchmarks: 'Benchmarks',
+                benchmarks: 'STIG Benchmark',
+                latestRev: 'Latest Revision',
+                latestRevDate: 'Latest Revision Date',
+                prevRev: 'Previous Revision',
+                prevRevDate: 'Previous Revision Date',
                 assessed: 'Assessed',
                 submitted: 'Submitted',
                 accepted: 'Accepted',
@@ -78,9 +79,42 @@ async function runSAReportByAsset(tokens, args) {
             //console.log(metrics);
 
             for (var j = 0; j < metrics.length; j++) {
-                var myData = getRow(collectionName, metrics[j], labelMap);
-                rows.push(myData);
 
+                var benchmarkIDs = metrics[j].benchmarkIds;
+                for (var idx = 0; idx < benchmarkIDs.length; idx++) {
+
+                    var revisions = await reportGetters.getBenchmarkRevisions(
+                        tokens.access_token,
+                        benchmarkIDs[idx]);
+
+                    var latestRev = '';
+                    var prevRev = '';
+                    var latestRevDate = '';
+                    var prevRevDate = '';
+                    for (var bmIdx = 0; bmIdx < revisions.length && bmIdx < 2; bmIdx++) {
+                        if (bmIdx === 0) {
+                            latestRev = revisions[bmIdx].revisionStr;
+                            latestRevDate = revisions[bmIdx].benchmarkDate;
+                        }
+                        else if (bmIdx === 1) {
+                            prevRev = revisions[bmIdx].revisionStr;
+                            prevRevDate = revisions[bmIdx].benchmarkDate;
+                        }
+                    }
+
+                    var myData = getRow(
+                        collectionName, 
+                        metrics[j], 
+                        labelMap, 
+                        latestRev,
+                        latestRevDate, 
+                        prevRev,
+                        prevRevDate,
+                        prevRevDate, 
+                        benchmarkIDs[idx]);
+                    rows.push(myData);
+
+                }
             }
         }
     }
@@ -91,8 +125,15 @@ async function runSAReportByAsset(tokens, args) {
     return rows;
 }
 
-function getRow(collectionName, metrics, labelMap) {
-    
+function getRow(collectionName, 
+    metrics, 
+    labelMap, 
+    latestRev, 
+    latestRevDate, 
+    prevRev,
+    prevRevDate,
+    benchmarkID) {
+
     const numAssessments = metrics.metrics.assessments;
     const numAssessed = metrics.metrics.assessed;
     const numSubmitted = metrics.metrics.statuses.submitted;
@@ -110,22 +151,22 @@ function getRow(collectionName, metrics, labelMap) {
         var labelDesc = labelMap.get(metrics.labels[iLabel].labelId);
 
         if (labelDesc) {
-            if (labelDesc.toUpperCase() === 'OWNER'){
-                if(primOwner === ""){
+            if (labelDesc.toUpperCase() === 'OWNER') {
+                if (primOwner === "") {
                     primOwner = metrics.labels[iLabel].name;
                 }
-                else{
+                else {
                     secOwner = metrics.labels[iLabel].name;
                 }
             }
             else if (labelDesc.toUpperCase() === 'PRIMARY SA') {
                 sysAdmin = metrics.labels[iLabel].name;
             }
-            else{
+            else {
                 labelName = metrics.labels[iLabel].name;
             }
         }
-        else{
+        else {
             labelName = metrics.labels[iLabel].name;
         }
     }
@@ -142,18 +183,16 @@ function getRow(collectionName, metrics, labelMap) {
     const sumOfCat2 = metrics.metrics.findings.medium;
     const sumOfCat1 = metrics.metrics.findings.high;
 
-    var benchmarkIDs = metrics.benchmarkIds.toString();
-    benchmarkIDs = benchmarkIDs.replaceAll(",", " ");
-
     var rowData = {
         collectionName: collectionName,
         asset: metrics.name,
         primOwner: primOwner,
-        secOwner: secOwner,
         sysAdmin: sysAdmin,
-        label: labelName,
-        stigs: metrics.benchmarkIds.length,
-        benchmarks: benchmarkIDs,
+        benchmarks: benchmarkID,
+        latestRev: latestRev,
+        latestRevDate: latestRevDate,
+        prevRev: prevRev,
+        prevRevDate: prevRevDate,
         assessed: avgAssessed + '%',
         submitted: avgSubmitted + '%',
         accepted: avgAccepted + '%',
@@ -167,4 +206,4 @@ function getRow(collectionName, metrics, labelMap) {
 
 }
 
-export { runSAReportByAsset };
+export { runSAReportWithMetricsAndVersions };

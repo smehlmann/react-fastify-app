@@ -9,6 +9,7 @@ function getCollectionsByEmassNumber(collections) {
             emassNum = emassNum.replace('_', '');
             idx = emassNum.search("_");
             emassNum = emassNum.substring(0, idx);
+            console.log('collection name: ' + collections[x].name + ' EMMAS: ' + emassNum);
             var myVal = emassMap.get(emassNum);
             if (myVal) {
                 myVal.push(collections[x]);

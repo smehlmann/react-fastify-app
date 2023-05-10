@@ -4,14 +4,32 @@ import promptSync from 'prompt-sync';
 import { stringify } from 'csv-stringify/sync';
 import fs from 'fs';
 
-async function runAssetCountReportByEmass(tokens) {
+async function runAssetCountReportByEmass(tokens, args) {
 
     try {
 
         //console.log(`runStatusReport: Requesting STIG Manager Collections`);
-        console.log(`runStatusReport: Requesting STIG Manager Data`);
-        const collections = await reportGetters.getCollections(tokens.access_token)
-        //console.log(collections);
+        console.log(`runAssetCountReportByEmass: Requesting STIG Manager Data`);
+        var collections = [];
+        var tempCollections = [];
+
+        tempCollections = await reportGetters.getCollections(tokens.access_token);
+        if (!args || args.length === 0) {
+            collections = tempCollections;
+        }
+        else {
+            var emassMap = reportUtils.getCollectionsByEmassNumber(tempCollections);
+            var emassArray = args.split(',');
+            for (var mapIdx = 0; mapIdx < emassArray.length; mapIdx++) {
+                if (emassMap.has(emassArray[mapIdx])) {
+
+                    var mappedCollection = emassMap.get(emassArray[mapIdx]);
+                    if (mappedCollection) {
+                        collections = collections.concat(mappedCollection);
+                    }
+                }
+            }
+        }
 
         var emassMap = reportUtils.getCollectionsByEmassNumber(collections);
 
@@ -20,7 +38,6 @@ async function runAssetCountReportByEmass(tokens) {
         var rows = [
             {
                 emassNum: 'EMASS Number',
-                collectionNames: 'Collections',
                 assetCount: 'Asset Count'
             }
 
@@ -49,30 +66,24 @@ async function runAssetCountReportByEmass(tokens) {
             iKey++;
             metricsData.length = 0;
         }
+
+        return rows;
     }
     catch (e) {
-        console.log(e)
+        console.log(e);
+        throw(e);
     }
-
-    return rows;
 }
 
 function getRow(emassNum, metricsData) {
 
     var totalAssetCount = 0;
-    var collectionNames = '';
     for (var i = 0; i < metricsData.length; i++) {
         totalAssetCount += metricsData[i].assets;
-        var name = metricsData[i].name;
-        collectionNames = collectionNames + metricsData[i].name + ', ';
     }
-
-    // remove trailing comma and white space
-    collectionNames = collectionNames.replace(/,\s*$/, "");
 
     var metricsData = {
         emassNum: emassNum,
-        collectionNames: collectionNames,
         assetCount: totalAssetCount
     }
 

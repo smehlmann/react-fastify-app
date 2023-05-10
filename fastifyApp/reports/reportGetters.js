@@ -8,12 +8,13 @@ import path from 'path';
 const apiBase = 'https://stigman.nren.navy.mil/np/api';
 
 async function getMetricsData(accessToken, myUrl) {
-  //console.log("getMetricsData: Requesting data.")
-  return await got.get(myUrl, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  }).json()
+
+    //console.log("getMetricsData: Requesting data.")
+    return await got.get(myUrl, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    }).json()
 }
 
 async function getCollections(accessToken) {
@@ -112,12 +113,12 @@ async function getCollectionMerticsAggreatedByAsset(accessToken, collectionId) {
 }
 
 // Return metrics for the specified Collection aggregated by collection ID, stig benchmark, asset ID, label ID
-async function getCollectionMerticsByCollectionBenchmarkAssetAndLabel(accessToken, collectionId,
-  benchmark, assetId, labelId) {
+async function getCollectionMerticsByCollectionBenchmarkAsset(accessToken, collectionId,
+  benchmark, assetId) {
 
   var myUrl = apiBase + '/collections/' + collectionId + '/metrics/detail/stig?benchmarkId=' +
-    benchmark + '&assetId=' + assetId + '&labelId=' + labelId + '&format=json';
-
+    benchmark + '&assetId=' + assetId + '&format=json';
+  console.log(myUrl);
   var metrics = getMetricsData(accessToken, myUrl);
   return metrics;
 
@@ -177,6 +178,13 @@ async function getLabelsByCollection(accessToken, collectionId) {
 
 }
 
+async function getBenchmarkRevisions(accessToken, benchmarkId) {
+  var myUrl = apiBase + '/stigs/' + benchmarkId + '/revisions';
+  var revisions = getMetricsData(accessToken, myUrl);
+  return revisions;
+
+}
+
 
 export {
   getCollections,
@@ -191,10 +199,11 @@ export {
   getFindingsByCollectionAndAsset,
   getFindingsByCollection,
   getCollectionMertics,
-  getCollectionMerticsByCollectionBenchmarkAssetAndLabel,
+  getCollectionMerticsByCollectionBenchmarkAsset,
   getCollectionMerticsByCollectionAndAsset,
   getCollectionMerticsByCollectionAssetAndLabel,
   getCollectionMerticsUnaggregated,
   getCollectionMerticsdByStig,
-  getLabelsByCollection
+  getLabelsByCollection,
+  getBenchmarkRevisions
 };

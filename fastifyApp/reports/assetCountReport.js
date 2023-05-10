@@ -1,19 +1,37 @@
 import * as reportGetters from './reportGetters.js';
+import * as reportUtils from './reportUtils.js';
 import promptSync from 'prompt-sync';
 import { stringify } from 'csv-stringify/sync';
 import fs from 'fs';
 
-async function runAssetCountReport(tokens) {
+async function runAssetCountReport(tokens, args) {
 
     try {
 
         //console.log(`runStatusReport: Requesting STIG Manager Collections`);
-        console.log(`runStatusReport: Requesting STIG Manager Data`);
-        const collections = await reportGetters.getCollections(tokens.access_token)
-        //console.log(collections);
-
+        console.log(`runAssetCountReport: Requesting STIG Manager Data`);
+        
         var metrics = [];
+        var collections = [];
+        var tempCollections = [];
 
+        tempCollections = await reportGetters.getCollections(tokens.access_token);
+        if (!args || args.length === 0) {
+            collections = tempCollections;
+        }
+        else {
+            var emassMap = reportUtils.getCollectionsByEmassNumber(tempCollections);
+            var emassArray = args.split(',');
+            for (var mapIdx = 0; mapIdx < emassArray.length; mapIdx++) {
+                if (emassMap.has(emassArray[mapIdx])) {
+
+                    var mappedCollection = emassMap.get(emassArray[mapIdx]);
+                    if (mappedCollection) {
+                        collections = collections.concat(mappedCollection);
+                    }
+                }
+            }
+        }
         var rows = [
             {
                 collectionName: 'Collection',
