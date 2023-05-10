@@ -56,18 +56,22 @@ class App extends Component {
   }
 
   callAPI(reportNum) {
-    //alert('in callApi for report: ' + reportNum);
-    var emassNum = this.state.emassNums;
-    var url = "http://localhost:5000?reportNum=" + reportNum;
-    if (emassNum && emassNum.length > 0) {
-      url = url + "&emassNum=" + this.state.emassNums;
+    try {
+      //alert('in callApi for report: ' + reportNum);
+      var emassNum = this.state.emassNums;
+      var url = "http://localhost:5000?reportNum=" + reportNum;
+      if (emassNum && emassNum.length > 0) {
+        url = url + "&emassNum=" + this.state.emassNums;
+      }
+      //alert(url);
+      //console.log('url: ' + url);
+      fetch(url)
+        .then(res => res.text())
+        //.then(res => this.setState({ apiResponse: res })
+        .then(res => this.setState({ apiResponse: res }))
+    } catch (e) {
+      alert("Request failed. " + e.message);
     }
-    //alert(url);
-    //console.log('url: ' + url);
-    fetch(url)
-      .then(res => res.text())
-      //.then(res => this.setState({ apiResponse: res })
-      .then(res => this.setState({ apiResponse: res }))
   }
 
   //componentDidMount() {
@@ -82,16 +86,10 @@ class App extends Component {
       report: e.target.value,
       disabled: false
     });
-    if (e.target.value === '5') {
-      /*var myEmassNum = prompt('Enter optional EMASS numbers.');
-      this.setState({
-        emassNums: myEmassNum
-      });*/
-      console.log("setting show");
-      this.setState({
-        showEmassNum: true
-      });
-    }
+    console.log("setting show");
+    this.setState({
+      showEmassNum: true
+    });
     console.log(this.state.emassNums);
   }
 
@@ -107,18 +105,18 @@ class App extends Component {
   }
 
   updateEmass(evt) {
-    const val = evt.target.value;    
+    const val = evt.target.value;
     this.setState({
       emassNums: val
     });
   }
 
- /* showComponent() {
-
-    this.setState({
-      showEmassNum: true
-    });
-  }*/
+  /* showComponent() {
+ 
+     this.setState({
+       showEmassNum: true
+     });
+   }*/
 
   LoadingSpinner() {
     return (
@@ -145,7 +143,7 @@ class App extends Component {
                 checked={this.state.report === "1"}
                 onChange={this.onRadioChange}
               />
-              <span>Run Assets Report by Collection</span>
+              <span>1. Run Assets Report by Collection</span>
             </label>
             <br />
             <label>
@@ -155,7 +153,7 @@ class App extends Component {
                 checked={this.state.report === "2"}
                 onChange={this.onRadioChange}
               />
-              <span>Run Status Report</span>
+              <span>2. Run Status Report</span>
             </label>
             <br />
             <label>
@@ -165,7 +163,7 @@ class App extends Component {
                 checked={this.state.report === "3"}
                 onChange={this.onRadioChange}
               />
-              <span>Run Asset Count Report</span>
+              <span>3. Run Asset Count Report</span>
             </label>
             <br />
             <label>
@@ -175,7 +173,7 @@ class App extends Component {
                 checked={this.state.report === "4"}
                 onChange={this.onRadioChange}
               />
-              <span>Run SA Report Aggregated by Label</span>
+              <span>4. Run SA Report</span>
             </label>
             <br />
             <label>
@@ -185,19 +183,8 @@ class App extends Component {
                 checked={this.state.report === "5"}
                 onChange={this.onRadioChange}
               />
-              <span>Run SA Report Aggregated Asset</span>
+              <span>5. Run SA Report Aggregated Asset</span>
               <br />
-              {showEmassNum && (
-                <div id='emassDiv'>
-                  <label htmlFor="emassNumsText">EMASS Numbers: </label>
-                  <input
-                    id='emassNumsText'
-                    type='text'
-                    value={this.state.emassNums}
-                    onChange={evt => this.updateEmass(evt)}
-                  />
-                </div>
-              )}
             </label>
             <label>
               <input
@@ -206,7 +193,7 @@ class App extends Component {
                 checked={this.state.report === "6"}
                 onChange={this.onRadioChange}
               />
-              <span>Run Asset Count Report by EMASS Number</span>
+              <span>6. Run Asset Count Report by EMASS Number</span>
             </label>
             <br />
             <label>
@@ -216,9 +203,31 @@ class App extends Component {
                 checked={this.state.report === "7"}
                 onChange={this.onRadioChange}
               />
-              <span>Run SAReport by Label and EMASS</span>
+              <span>7. Run SAReport by EMASS</span>
+            </label>
+            <br />
+            <label>
+              <input
+                type="radio"
+                value="8"
+                checked={this.state.report === "8"}
+                onChange={this.onRadioChange}
+              />
+              <span>8. Run SAReport With Metrics and STIG Benchmark Versions</span>
             </label>
             <br /><br />
+            {showEmassNum && (
+              <div id='emassDiv'>
+                <label htmlFor="emassNumsText">Optional: Enter EMASS Numbers: </label>
+                <input
+                  id='emassNumsText'
+                  type='text'
+                  value={this.state.emassNums}
+                  onChange={evt => this.updateEmass(evt)}
+                />
+              </div>
+            )}
+            <br />
             <button className="submit-btn" type="submit" disabled={this.state.disabled}>Run Report</button>
             <br /><br />
             <div id="csv-ink-div">
