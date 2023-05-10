@@ -15,12 +15,12 @@ import * as saReportByAsset from './reports/saReportByAsset.js';
 import * as assetCountReportByEmass from './reports/assetCountReportByEmass.js';
 import * as saReportByLabelAndEmass from './reports/saReportByLabelAndEmass.js';
 import * as assetsByCollectionsReport from './reports/assetsByCollectionsReport.js';
+import * as saReportWithMetricsAndVersions from './reports/saReportWithMetricsAndVersions.js';
 
 const oidcBase = 'https://stigman.nren.navy.mil/auth/realms/np-stigman'
 const apiBase = 'https://stigman.nren.navy.mil/np/api'
 const client_id = 'np-stig-manager'
-const scope = 'openid stig-manager:collection stig-manager:user stig-manager:stig stig-manager:op'
-
+const scope = 'openid stig-manager:collection stig-manager:user stig-manager:stig stig-manager:op stig-manager:stig:read'
 
 const fastify = Fastify({
   logger: true
@@ -77,25 +77,25 @@ async function run(selection, emassNums) {
     if (selection == 1) {
       console.log('Run Assets by Collection');
       let tokens = await getTokens(oidcBase, client_id, scope);
-      rows = await assetsByCollectionsReport.runAssetByCollectionReport(tokens);
+      rows = await assetsByCollectionsReport.runAssetByCollectionReport(tokens, emassNums);
       return rows;
     }
     else if (selection == 2) {
       console.log('Run Status Report');
       let tokens = await getTokens(oidcBase, client_id, scope);
-      rows = await statusReport.runStatusReport(tokens);
+      rows = await statusReport.runStatusReport(tokens, emassNums);
       return rows;
     }
     else if (selection == 3) {
       console.log('Run Asset Count Report');
       let tokens = await getTokens(oidcBase, client_id, scope);
-      rows = await assetCountReport.runAssetCountReport(tokens);
+      rows = await assetCountReport.runAssetCountReport(tokens, emassNums);
       return rows;
     }
     else if (selection == 4) {
       console.log('Run SA Report');
       let tokens = await getTokens(oidcBase, client_id, scope);
-      rows = saReport.runSAReport(tokens);
+      rows = await saReport.runSAReport(tokens, emassNums);
       return rows;
     }
     else if (selection == 5) {
@@ -107,13 +107,19 @@ async function run(selection, emassNums) {
     else if (selection == 6) {
       console.log('Run Asset Count Report by EMASS Number')
       let tokens = await getTokens(oidcBase, client_id, scope);
-      rows = await assetCountReportByEmass.runAssetCountReportByEmass(tokens);
+      rows = await assetCountReportByEmass.runAssetCountReportByEmass(tokens, emassNums);
       return rows;
     }
     else if (selection == 7) {
       console.log('Run SAReport by Label and EMASS');
       let tokens = await getTokens(oidcBase, client_id, scope);
-      rows = await saReportByLabelAndEmass.runSAReportByLabelAndEmass(tokens);
+      rows = await saReportByLabelAndEmass.runSAReportByLabelAndEmass(tokens, emassNums);
+      return rows;
+    }
+    else if (selection == 8) {
+      console.log('Run SAReport with Metrics and STIG Benchmark Revisions');
+      let tokens = await getTokens(oidcBase, client_id, scope);
+      rows = await saReportWithMetricsAndVersions.runSAReportWithMetricsAndVersions(tokens, emassNums);
       return rows;
     }
     else {
