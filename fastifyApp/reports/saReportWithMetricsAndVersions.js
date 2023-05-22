@@ -9,8 +9,7 @@ async function runSAReportWithMetricsAndVersions(tokens, args) {
 
     try {
 
-        //const prompt = promptSync();
-        //const collectionName = prompt('Enter collection name.');
+        const currentQuarter = reportUtils.getCurrentQuarter();
 
         console.log(`runSAReportWithMetricsAndVersions: Requesting STIG Manager Collections`);
         //console.log(`runStatusReport: Requesting STIG Manager Data for collection ` + collectionName);
@@ -49,9 +48,8 @@ async function runSAReportWithMetricsAndVersions(tokens, args) {
                 sysAdmin: 'Sys Admin',
                 benchmarks: 'STIG Benchmark',
                 latestRev: 'Latest Revision',
-                latestRevDate: 'Latest Revision Date',
                 prevRev: 'Previous Revision',
-                prevRevDate: 'Previous Revision Date',
+                quarterVer: 'Current Quarter STIG Version',
                 assessed: 'Assessed',
                 submitted: 'Submitted',
                 accepted: 'Accepted',
@@ -103,15 +101,15 @@ async function runSAReportWithMetricsAndVersions(tokens, args) {
                     }
 
                     var myData = getRow(
-                        collectionName, 
-                        metrics[j], 
-                        labelMap, 
+                        collectionName,
+                        metrics[j],
+                        labelMap,
                         latestRev,
-                        latestRevDate, 
+                        latestRevDate,
                         prevRev,
-                        prevRevDate,
-                        prevRevDate, 
-                        benchmarkIDs[idx]);
+                        benchmarkIDs[idx],
+                        currentQuarter);
+                        
                     rows.push(myData);
 
                 }
@@ -125,14 +123,16 @@ async function runSAReportWithMetricsAndVersions(tokens, args) {
     return rows;
 }
 
-function getRow(collectionName, 
-    metrics, 
-    labelMap, 
-    latestRev, 
-    latestRevDate, 
+function getRow(collectionName,
+    metrics,
+    labelMap,
+    latestRev,
+    latestRevDate,
     prevRev,
-    prevRevDate,
-    benchmarkID) {
+    benchmarkID,
+    currentQuarter) {
+
+    const quarterVer = reportUtils.getVersionForQuarter(currentQuarter, latestRevDate, latestRev);
 
     const numAssessments = metrics.metrics.assessments;
     const numAssessed = metrics.metrics.assessed;
@@ -171,6 +171,7 @@ function getRow(collectionName,
         }
     }
 
+
     const numUnassessed = numAssessments - numAssessed;
     const totalChecks = numAssessments;
 
@@ -190,9 +191,8 @@ function getRow(collectionName,
         sysAdmin: sysAdmin,
         benchmarks: benchmarkID,
         latestRev: latestRev,
-        latestRevDate: latestRevDate,
         prevRev: prevRev,
-        prevRevDate: prevRevDate,
+        quarterVer: quarterVer,
         assessed: avgAssessed + '%',
         submitted: avgSubmitted + '%',
         accepted: avgAccepted + '%',

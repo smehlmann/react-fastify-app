@@ -1,3 +1,4 @@
+import { closeSync } from 'fs';
 import * as reportGetters from './reportGetters.js';
 import * as reportUtils from './reportUtils.js';
 //import promptSync from 'prompt-sync';
@@ -9,8 +10,7 @@ async function runSAReportByLabelAndEmass(tokens, args) {
 
     try {
 
-        console.log(`runSAReportByLabelAndEmass: Requesting STIG Manager Collections`);
-        //console.log(`runSAReportByLabelAndEmass Requesting STIG Manager Data for collection ` + collectionName);
+closeSync        //console.log(`runSAReportByLabelAndEmass Requesting STIG Manager Data for collection ` + collectionName);
 
         var collections = [];
         var tempCollections = [];
@@ -36,10 +36,13 @@ async function runSAReportByLabelAndEmass(tokens, args) {
         //console.log(collections);
 
         var emassMap = reportUtils.getCollectionsByEmassNumber(collections);
+        var acronymMap = reportUtils.getEmassAcronymMap();
+
         var metrics = [];
         var rows = [
             {
-                emass: 'EMASS Number',
+                emass: 'eMASS Number',
+                acronym: 'eMASS Acronym',
                 asset: 'Asset',
                 assessed: 'Assessed',
                 submitted: 'Submitted',
@@ -64,26 +67,33 @@ async function runSAReportByLabelAndEmass(tokens, args) {
 
             for (var i = 0; i < myCollections.length; i++) {
 
-                metrics = await reportGetters.getCollectionMerticsAggreatedByLabel(tokens.access_token, myCollections[i].collectionId);
-                //console.log(metrics);
-                metricsData.push(metrics);
+                var containsStr = myCollections[i].name.includes('Database/Web');
+
+                if (!containsStr) {
+                    metrics = await reportGetters.getCollectionMerticsAggreatedByLabel(
+                        tokens.access_token, myCollections[i].collectionId);
+                    //console.log(metrics);
+                    metricsData.push(metrics);
+                }
             }
 
-            var myData = getRow(emassNum, metricsData);
-            rows.push(myData);
+            if (metricsData.length > 0) {
+                var myData = getRow(emassNum, metricsData, acronymMap);
+                rows.push(myData);
+            }
             iKey++;
-            metricsData.length = 0;            
+            metricsData.length = 0;
         }
 
         return rows;
     }
     catch (e) {
         console.log(e);
-        throw(e);
+        throw (e);
     }
 }
 
-function getRow(emassNum, metrics) {
+function getRow(emassNum, metrics, acronymMap) {
 
     var numAssessments = 0;
     var numAssessed = 0;
@@ -94,7 +104,7 @@ function getRow(emassNum, metrics) {
     var sumOfCat3 = 0;
     var sumOfCat2 = 0;
     var sumOfCat1 = 0;
-    
+
     for (var i = 0; i < metrics.length; i++) {
         var myMetricsData = metrics[i];
         //console.log(myMetricsData);
@@ -111,10 +121,10 @@ function getRow(emassNum, metrics) {
             numAssets += myMetricsData[j].assets;
             sumOfCat3 += myMetrics.findings.low;
             sumOfCat2 += myMetrics.findings.medium;
-            sumOfCat1 += myMetrics.findings.high;            
+            sumOfCat1 += myMetrics.findings.high;
         }
     }
-    
+
     const numUnassessed = numAssessments - numAssessed;
     const totalChecks = numAssessments;
 
@@ -123,8 +133,14 @@ function getRow(emassNum, metrics) {
     const avgAccepted = Math.round(numAssessments ? ((numAccepted) / numAssessments) * 100 : 0);
     const avgRejected = Math.round(numAssessments ? ((numRejected) / numAssessments) * 100 : 0);
 
+    var emassAcronym = acronymMap.get(emassNum);
+    if (!emassAcronym ) {
+        emassAcronym = '';
+    }
+
     var rowData = {
         emass: emassNum,
+        acronym: emassAcronym,
         asset: numAssets,
         assessed: avgAssessed + '%',
         submitted: avgSubmitted + '%',
