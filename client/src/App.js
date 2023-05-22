@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
-import { RadioButton } from "./RadioButton";
-import { CSVLink, CSVDownload } from 'react-csv';
+import { CSVLink } from 'react-csv';
 
 class App extends Component {
 
+  /* class Constructor sets state */
   constructor(props) {
     super(props);
     this.state = {
@@ -143,7 +143,7 @@ class App extends Component {
                 checked={this.state.report === "1"}
                 onChange={this.onRadioChange}
               />
-              <span>1. Run Assets Report by Collection</span>
+              <span>1. RMF SAP Report</span>
             </label>
             <br />
             <label>
@@ -153,17 +153,7 @@ class App extends Component {
                 checked={this.state.report === "2"}
                 onChange={this.onRadioChange}
               />
-              <span>2. Run Status Report</span>
-            </label>
-            <br />
-            <label>
-              <input
-                type="radio"
-                value="3"
-                checked={this.state.report === "3"}
-                onChange={this.onRadioChange}
-              />
-              <span>3. Run Asset Count Report</span>
+              <span>2. STIG Status per Collection</span>
             </label>
             <br />
             <label>
@@ -173,7 +163,7 @@ class App extends Component {
                 checked={this.state.report === "4"}
                 onChange={this.onRadioChange}
               />
-              <span>4. Run SA Report</span>
+              <span>3. Asset Status per Collection</span>
             </label>
             <br />
             <label>
@@ -183,17 +173,7 @@ class App extends Component {
                 checked={this.state.report === "5"}
                 onChange={this.onRadioChange}
               />
-              <span>5. Run SA Report Aggregated Asset</span>
-              <br />
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="6"
-                checked={this.state.report === "6"}
-                onChange={this.onRadioChange}
-              />
-              <span>6. Run Asset Count Report by EMASS Number</span>
+              <span>4. Asset Collection per Primary Owner and System Admin</span>
             </label>
             <br />
             <label>
@@ -203,7 +183,7 @@ class App extends Component {
                 checked={this.state.report === "7"}
                 onChange={this.onRadioChange}
               />
-              <span>7. Run SAReport by EMASS</span>
+              <span>5. </span>Asset Status per eMASS
             </label>
             <br />
             <label>
@@ -213,7 +193,7 @@ class App extends Component {
                 checked={this.state.report === "8"}
                 onChange={this.onRadioChange}
               />
-              <span>8. Run SAReport With Metrics and STIG Benchmark Versions</span>
+              <span>6. STIG Deltas per Primary Owner and System Admin</span>
             </label>
             <br /><br />
             {showEmassNum && (
