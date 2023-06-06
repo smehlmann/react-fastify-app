@@ -93,7 +93,7 @@ function getRow(emassNum, collectionName, stigs, assets) {
 
     for (var i = 0; i < assets.length; i++) {
         if (i < assets.length - 1) {
-            assetNames += assets[i].name + '; '
+            assetNames += assets[i].name + ';'
         }
         else {
             assetNames += assets[i].name

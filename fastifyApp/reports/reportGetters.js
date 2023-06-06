@@ -185,6 +185,27 @@ async function getBenchmarkRevisions(accessToken, benchmarkId) {
 
 }
 
+async function createLabel(accessToken, collectionId, labelDetails) {
+
+  var myUrl = apiBase + '/collections/' + collectionId + '/labels';
+
+  var label = await got.post(myUrl, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    json: labelData
+  }).json();
+
+  return label;
+}
+
+async function deleteLabel(accessToken, collectionId) {
+
+  //console.log('getAssetsByLabel');
+  var myUrl = apiBase + '/collections/' + collectionId + '/labels' + labelId;
+  var labels = getMetricsData(accessToken, myUrl);
+  return;
+}
 
 export {
   getCollections,

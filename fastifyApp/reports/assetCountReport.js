@@ -48,29 +48,7 @@ async function runAssetCountReport(tokens, args) {
 
             var myData = getRow(collectionName, metrics);
             rows.push(myData);
-        }
-/*        
-        const output = stringify(rows, function (err, output) {
-            header: true
-            //console.log(output)
-
-        })
-*/        
-
-/*        
-        const prompt = promptSync()
-        const filePath = prompt('Where do you want to save the file? Enter full path name.')
-        console.log(filePath)
-
-        fs.writeFile(filePath, output, function (err) {
-            if (err) {
-                return console.log(err);
-            }
-            else {
-                console.log("The file was saved!");
-            }
-        });
-*/        
+        } 
     }
     catch (e) {
         console.log(e)
