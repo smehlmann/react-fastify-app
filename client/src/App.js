@@ -1,12 +1,17 @@
 import React, { Component } from 'react';
 import './App.css';
 import { CSVLink } from 'react-csv';
+//import { usePapaParse } from 'react-papaparse';
+import Papa from 'papaparse';
 
 class App extends Component {
 
   /* class Constructor sets state */
   constructor(props) {
     super(props);
+    this.getHeader = this.getHeader.bind(this);
+    this.getRowsData = this.getRowsData.bind(this);
+    this.getKeys = this.getKeys.bind(this);
     this.state = {
       apiResponse: "",
       fileData: "",
@@ -15,8 +20,12 @@ class App extends Component {
       fileName: "",
       output: "",
       emassNums: "",
-      showEmassNum: false
+      showEmassNum: false,
+      showData: false
     };
+
+
+    var jsonData = null;
 
     //const formName = useRef(null);
     this.onRadioChange = this.onRadioChange.bind(this);
@@ -46,7 +55,8 @@ class App extends Component {
     if (prevState.apiResponse !== this.state.apiResponse) {
       console.log('apiResponse has changed.');
       this.setState({
-        fileData: this.state.apiResponse
+        fileData: this.state.apiResponse,
+        showData: true
       });
 
       if (this.state.apiResponse.length > 0) {
@@ -104,19 +114,17 @@ class App extends Component {
       this.callAPI(this.state.report);
   }
 
+  newReport() {
+    alert("In new report");
+    window.location.reload();
+  }
+
   updateEmass(evt) {
     const val = evt.target.value;
     this.setState({
       emassNums: val
     });
   }
-
-  /* showComponent() {
- 
-     this.setState({
-       showEmassNum: true
-     });
-   }*/
 
   LoadingSpinner() {
     return (
@@ -127,8 +135,34 @@ class App extends Component {
     );
   }
 
+  getKeys = function () {
+
+    this.jsonData = Papa.parse(this.state.apiResponse, { header: true });
+    console.log('jsonData: ' + this.jsonData.data);
+
+    var keys = this.jsonData.data[0];
+    return Object.keys(keys);
+  }
+
+  getHeader = function () {
+    var keys = this.getKeys();
+    return keys.map((key, index) => {
+      return <th key={key}>{key.toUpperCase()}</th>
+    })
+  }
+
+  getRowsData = function () {
+    //var items = this.state.apiResponse;
+    var items = this.jsonData.data;
+    var keys = this.getKeys();
+    return items.map((row, index) => {
+      return <tr key={index}><RenderRow key={index} data={row} keys={keys} /></tr>
+    })
+  }
+
   render() {
     const showEmassNum = this.state.showEmassNum;
+    const showData = this.state.showData;
     return (
       <div className="App">
         <div className="title-div">
@@ -209,20 +243,42 @@ class App extends Component {
             )}
             <br />
             <button className="submit-btn" type="submit" disabled={this.state.disabled}>Run Report</button>
+            <button className="new-report-btn" type='reset' onClick={this.newReport}>New Report</button>
             <br /><br />
-            <div id="csv-ink-div">
-              <CSVLink
-                data={this.state.fileData}
-                onClick={() => {
-                  window.location.reload();
-                }}
-              >Download report.</CSVLink>
-            </div>
+            {showData && (
+              <div id='tableDiv'>
+                <div id="csv-ink-div">
+                  <CSVLink
+                    data={this.state.fileData}
+                    onClick={() => {
+                      //window.location.reload();
+                    }}
+                  >Export report to CSV file.</CSVLink>
+                </div>
+                <br /><br />
+                <div>
+                  <table>
+                    <thead>
+                      <tr>{this.getHeader()}</tr>
+                    </thead>
+                    <tbody>
+                      {this.getRowsData()}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </form>
         </div>
       </div >
     );
   }
+}
+
+const RenderRow = (props) => {
+  return props.keys.map((key, index) => {
+    return <td key={props.data[key]}>{props.data[key]}</td>
+  })
 }
 
 export default App;

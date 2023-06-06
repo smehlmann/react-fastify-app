@@ -17,7 +17,7 @@ div.App {
   font-size: 18px;
 }
 
-.submit-btn {
+.submit-btn, .new-report-btn {
   appearance: none;
   backface-visibility: hidden;
   background-color: #2f80ed;
@@ -49,7 +49,23 @@ div.App {
   white-space: nowrap;
 }
 
-.submit-btn:hover {
+/*.button-row {
+  display: flex;
+  height: 100%;
+}*/
+
+.submit-btn {
+  display: inline-block;
+  margin: 30px;
+}
+
+.new-report-btn{
+  display: inline-block;
+  margin: 30px;
+}
+
+
+.submit-btn:hover, .new-report-btn:hover {
   /*background-color: #1366d6;*/
   background-color: #7393B3;
   box-shadow: rgba(0, 0, 0, .05) 0 5px 30px, rgba(0, 0, 0, .05) 0 1px 4px;
@@ -58,23 +74,23 @@ div.App {
   transition-duration: .35s;
 }
 
-.submit-btn:active {
+.submit-btn:active, .new-report-btn:active {
   background-color: #0047AB;
   box-shadow: 0 5px #666;
   transform: translateY(4px);
 }
 
-.submit-btn:hover:after {
+.submit-btn:hover:after, .new-report-btn:after {
   opacity: .5;
 }
 
-.submit-btn:active {
+.submit-btn:active, .new-report-btn:active {
   box-shadow: rgba(0, 0, 0, .1) 0 3px 6px 0, rgba(0, 0, 0, .1) 0 0 10px 0, rgba(0, 0, 0, .1) 0 1px 4px -1px;
   transform: translateY(2px);
   transition-duration: .35s;
 }
 
-.submit-btn:active:after {
+.submit-btn:active:after, .new-report-btn:after {
   opacity: 1;
 }
 
