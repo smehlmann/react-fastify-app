@@ -10,7 +10,7 @@ async function runSAReportByLabelAndEmass(tokens, args) {
 
     try {
 
-closeSync        //console.log(`runSAReportByLabelAndEmass Requesting STIG Manager Data for collection ` + collectionName);
+       //console.log(`runSAReportByLabelAndEmass Requesting STIG Manager Data for collection ` + collectionName);
 
         var collections = [];
         var tempCollections = [];

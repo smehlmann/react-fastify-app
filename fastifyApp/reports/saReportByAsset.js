@@ -1,9 +1,6 @@
 import * as reportGetters from './reportGetters.js';
 import * as reportUtils from './reportUtils.js';
-import promptSync from 'prompt-sync';
 import { stringify } from 'csv-stringify/sync';
-import fs from 'fs';
-import path from 'path'
 
 async function runSAReportByAsset(tokens, args) {
 
@@ -38,7 +35,7 @@ async function runSAReportByAsset(tokens, args) {
         //const collections = await reportGetters.getCollectionByName(tokens.access_token, collectionName);
 
         var metrics = [];
-        var labels= [];
+        var labels = [];
         let labelMap = new Map();
 
         var rows = [
@@ -47,6 +44,8 @@ async function runSAReportByAsset(tokens, args) {
                 asset: 'Asset',
                 primOwner: 'Primary Owner',
                 sysAdmin: 'Sys Admin',
+                deviveType: 'Device-Asset',
+                lastTouched: 'Last Touched',
                 stigs: 'STIGs',
                 benchmarks: 'Benchmarks',
                 assessed: 'Assessed',
@@ -65,7 +64,10 @@ async function runSAReportByAsset(tokens, args) {
             //console.log(collectionName);
             labelMap.clear();
             labels.length = 0;
-
+            if(collectionName.toUpperCase() === 'HAPPY CORP')
+            {
+                continue;
+            }
             labels = await reportGetters.getLabelsByCollection(tokens.access_token, collections[i].collectionId);
             for (var x = 0; x < labels.length; x++) {
                 labelMap.set(labels[x].labelId, labels[x].description);
@@ -90,7 +92,7 @@ async function runSAReportByAsset(tokens, args) {
 }
 
 function getRow(collectionName, metrics, labelMap) {
-    
+
     const numAssessments = metrics.metrics.assessments;
     const numAssessed = metrics.metrics.assessed;
     const numSubmitted = metrics.metrics.statuses.submitted;
@@ -99,31 +101,52 @@ function getRow(collectionName, metrics, labelMap) {
     const numSaved = metrics.metrics.statuses.rejected;
     const numAssets = metrics.assets;
 
+    var maxTouchTs = metrics.metrics.maxTouchTs;
+    var touchDate = new Date(maxTouchTs);
+    var today = new Date();
+    var timeDiff = today - touchDate;
+    var diffInHours = timeDiff / (1000 * 3600);
+    var diffInDays = timeDiff / (1000 * 3600 * 24);
+    var lastTouched = "";
+
+    // set lastTouched to either hours or days
+    if(diffInDays < 1){
+        lastTouched = diffInHours.toString + ' h';
+    }
+    else{
+        var touched = Math.round(diffInDays);
+        lastTouched = touched.toString() + ' d';
+    }
+    
     var primOwner = "";
     var secOwner = "";
     var sysAdmin = "";
+    var device = "";
     var labelName = "";
     for (var iLabel = 0; iLabel < metrics.labels.length; iLabel++) {
 
         var labelDesc = labelMap.get(metrics.labels[iLabel].labelId);
 
         if (labelDesc) {
-            if (labelDesc.toUpperCase() === 'OWNER'){
-                if(primOwner === ""){
+            if (labelDesc.toUpperCase() === 'PRIMARY OWNER') {
+                if (primOwner === "") {
                     primOwner = metrics.labels[iLabel].name;
                 }
-                else{
+                else {
                     secOwner = metrics.labels[iLabel].name;
                 }
             }
-            else if (labelDesc.toUpperCase() === 'PRIMARY SA') {
+            else if (labelDesc.toUpperCase() === 'SYS ADMIN') {
                 sysAdmin = metrics.labels[iLabel].name;
             }
-            else{
+            else if (labelDesc.toUpperCase() === 'ASSET TYPE') {
+                device = metrics.labels[iLabel].name;
+            }
+            else {
                 labelName = metrics.labels[iLabel].name;
             }
         }
-        else{
+        else {
             labelName = metrics.labels[iLabel].name;
         }
     }
@@ -148,6 +171,8 @@ function getRow(collectionName, metrics, labelMap) {
         asset: metrics.name,
         primOwner: primOwner,
         sysAdmin: sysAdmin,
+        deviveType: device,
+        lastTouched: lastTouched,
         stigs: metrics.benchmarkIds.length,
         benchmarks: benchmarkIDs,
         assessed: avgAssessed + '%',

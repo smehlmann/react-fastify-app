@@ -63,10 +63,12 @@ async function runSAReportWithMetricsAndVersions(tokens, args) {
 
         for (var i = 0; i < collections.length; i++) {
             var collectionName = collections[i].name;
-            //console.log(collectionName);
+            console.log(collectionName);
             labelMap.clear();
             labels.length = 0;
-
+            if(collectionName.toUpperCase() === "HAPPY CORP"){
+                continue;
+            }
             labels = await reportGetters.getLabelsByCollection(tokens.access_token, collections[i].collectionId);
             for (var x = 0; x < labels.length; x++) {
                 labelMap.set(labels[x].labelId, labels[x].description);
@@ -151,15 +153,10 @@ function getRow(collectionName,
         var labelDesc = labelMap.get(metrics.labels[iLabel].labelId);
 
         if (labelDesc) {
-            if (labelDesc.toUpperCase() === 'OWNER') {
-                if (primOwner === "") {
+            if (labelDesc.toUpperCase() === 'PRIMARY OWNER') {
                     primOwner = metrics.labels[iLabel].name;
-                }
-                else {
-                    secOwner = metrics.labels[iLabel].name;
-                }
             }
-            else if (labelDesc.toUpperCase() === 'PRIMARY SA') {
+            else if (labelDesc.toUpperCase() === 'SYS ADMIN') {
                 sysAdmin = metrics.labels[iLabel].name;
             }
             else {

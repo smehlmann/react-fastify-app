@@ -48,6 +48,7 @@ function getCollectionsByEmassNumber(collections) {
     return emassMap;
 }
 
+
 function getCurrentQuarter() {
 
     const currentDate = new Date();
@@ -57,14 +58,14 @@ function getCurrentQuarter() {
 
 
     var retQuarter = null;
-    for (var i = 0; i < quarters.length; i++){
+    for (var i = 0; i < quarters.length; i++) {
         var splitStartDate = quarters[i].startDate.split('/');
         var splitEndDate = quarters[i].endDate.split('/');
 
         // Are the years the same?
-        if(splitStartDate[2] == currentYear){
+        if (splitStartDate[2] == currentYear) {
             // is the month within range
-            if(( currentMonth >= splitStartDate[0]) && currentMonth <= splitEndDate[0]){
+            if ((currentMonth >= splitStartDate[0]) && currentMonth <= splitEndDate[0]) {
                 retQuarter = quarters[i];
                 break;
             }
@@ -82,7 +83,7 @@ function getVersionForQuarter(quarter, versionDateStr, versionStr) {
     var returnVer = '';
 
     /* if quarter is null, return an empty string */
-    if(!quarter){
+    if (!quarter) {
         return returnVer;
     }
 
@@ -91,12 +92,12 @@ function getVersionForQuarter(quarter, versionDateStr, versionStr) {
     var endSplitDate = quarter.endDate.split('/');
 
     /* check that the years are the same */
-    if (splitVersionDateStr[0] === startSplitDate[2] && 
+    if (splitVersionDateStr[0] === startSplitDate[2] &&
         splitVersionDateStr[0] == endSplitDate[2]) {
 
         /* check if the month is in range for the quarter */
         if ((parseInt(splitVersionDateStr[1]) >= parseInt(startSplitDate[1])) &&
-            (parseInt(splitVersionDateStr[1]) <= parseInt(endSplitDate[1]))){
+            (parseInt(splitVersionDateStr[1]) <= parseInt(endSplitDate[1]))) {
             returnVer = versionStr;
         }
     }
@@ -105,8 +106,7 @@ function getVersionForQuarter(quarter, versionDateStr, versionStr) {
 
 }
 
-function getEmassAcronymMap()
-{
+function getEmassAcronymMap() {
 
     let emassAcronymMap = new Map();
 
@@ -140,9 +140,9 @@ function getEmassAcronymMap()
     return emassAcronymMap;
 }
 
-export { 
+export {
     getCollectionsByEmassNumber,
-    getCurrentQuarter, 
+    getCurrentQuarter,
     getVersionForQuarter,
-    getEmassAcronymMap 
+    getEmassAcronymMap
 };
