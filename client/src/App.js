@@ -115,7 +115,7 @@ class App extends Component {
   }
 
   newReport() {
-    alert("In new report");
+    //alert("In new report");
     window.location.reload();
   }
 
