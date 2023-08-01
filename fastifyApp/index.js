@@ -1,6 +1,5 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
-
 import got from 'got'
 import open from 'open'
 import promptSync from 'prompt-sync'
@@ -16,15 +15,17 @@ import * as assetCountReportByEmass from './reports/assetCountReportByEmass.js';
 import * as saReportByLabelAndEmass from './reports/saReportByLabelAndEmass.js';
 import * as assetsByCollectionsReport from './reports/assetsByCollectionsReport.js';
 import * as saReportWithMetricsAndVersions from './reports/saReportWithMetricsAndVersions.js';
+import * as manageLabels from './labelOps/manageLabels.js';
 
 const oidcBase = 'https://stigman.nren.navy.mil/auth/realms/np-stigman'
 const apiBase = 'https://stigman.nren.navy.mil/np/api'
 const client_id = 'np-stig-manager'
-const scope = 'openid stig-manager:collection stig-manager:user stig-manager:stig stig-manager:op stig-manager:stig:read'
+const scope =
+  'openid stig-manager:collection stig-manager:user stig-manager:stig stig-manager:op stig-manager:stig:read stig-manager:stig:write'
 
 const fastify = Fastify({
   logger: true
-})
+});
 
 await fastify.register(cors, {
   // put your options here
@@ -33,6 +34,17 @@ await fastify.register(cors, {
 const prompt = promptSync();
 var rows = [];
 
+fastify.post('/labels', (req, reply) => {
+  var labelInfo = req.body;
+  console.log('labelInfo: ' + labelInfo);
+  labelInfo.forEach((labelDetail) => {
+    console.log(labelDetail);
+  });
+
+  /* create the labels */
+  retData = addLabels(labelInfo, reply);
+})
+
 fastify.get('/', (req, reply) => {
   console.log('req: ' + req.url);
   var url = req.url;
@@ -40,27 +52,54 @@ fastify.get('/', (req, reply) => {
   paramList[0] = paramList[0].substring(2);
   var reportNum;
   var emassNums;
-  for(var i = 0; i < paramList.length; i++){
+  var parsedLabelData;
+
+  for (var i = 0; i < paramList.length; i++) {
     var param = paramList[i].split('=');
-    if(param[0] === 'reportNum'){
+    if (param[0] === 'reportNum') {
       reportNum = param[1];
     }
-    else if(param[0] === 'emassNum'){
+    else if (param[0] === 'emassNum') {
       emassNums = param[1];
     }
+    else if (param[0] === 'parsedData') {
+      parsedData = param[1];
+    }
   }
-  
+
   console.log('calling Run(' + reportNum + ')');
   rows = runReports(reportNum, emassNums, reply);
-  //rows = run(reportNum);
-  //reply.send({ hello: 'world' })
 })
 
+
+/* wait for events on port 5000 */
 await fastify.listen({ port: 5000 });
+
+async function addLabels(labelInfo, reply) {
+  const myReply = await createLabels(labelInfo);
+  var msg = 'Label creation done!';
+  //msg = stringify(msg);
+  console.log(msg);
+  //reply.send(msg);
+}
+
+async function createLabels(labelInfo) {
+  rows = [];
+  try {
+    console.log('Create labels.');
+    let tokens = await getTokens(oidcBase, client_id, scope);
+    rows = await manageLabels.addNewLabel(tokens, labelInfo);
+    //rows = await manageLabels.addNewLabel(oidcBase, client_id, scope, labelInfo);
+    return rows;
+  }
+  catch (e) {
+    console.log(e.message);
+  }
+}
 
 async function runReports(reportNum, emassNums, reply) {
   const rows = await run(reportNum, emassNums);
-  console.log('calling stringify');
+  //console.log('calling stringify');
   const output = stringify(rows, function (err, output) {
     header: true
     //console.log(output)
@@ -120,6 +159,12 @@ async function run(selection, emassNums) {
       console.log('Run SAReport with Metrics and STIG Benchmark Revisions');
       let tokens = await getTokens(oidcBase, client_id, scope);
       rows = await saReportWithMetricsAndVersions.runSAReportWithMetricsAndVersions(tokens, emassNums);
+      return rows;
+    }
+    else if (selection == 102) {
+      console.log('Run Delete All Labels');
+      let tokens = await getTokens(oidcBase, client_id, scope);
+      rows = await manageLabels.deleteAllLabels(tokens);
       return rows;
     }
     else {
@@ -221,3 +266,5 @@ async function getTokens(oidcBase, client_id, scope) {
     console.log(e);
   }
 }
+
+export { getTokens }
