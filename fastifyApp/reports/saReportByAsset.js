@@ -111,7 +111,8 @@ function getRow(collectionName, metrics, labelMap) {
 
     // set lastTouched to either hours or days
     if(diffInDays < 1){
-        lastTouched = diffInHours.toString + ' h';
+        var touched = Math.round(diffInHours);
+        lastTouched = touched + ' h';
     }
     else{
         var touched = Math.round(diffInDays);
