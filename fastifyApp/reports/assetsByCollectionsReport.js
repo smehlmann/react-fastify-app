@@ -89,7 +89,8 @@ function getRow(emassNum, collectionName, stigs, assets) {
 
     var assetNames = ''
     var benchmarkId = stigs.benchmarkId
-    var stigVersion = stigs.lastRevisionStr
+    var stigVersion = stigs.revisionStr;
+
 
     for (var i = 0; i < assets.length; i++) {
         if (i < assets.length - 1) {
