@@ -229,6 +229,16 @@ class App extends Component {
               />
               <span>6. STIG Deltas per Primary Owner and System Admin</span>
             </label>
+            <br />
+            <label>
+              <input
+                type="radio"
+                value="9"
+                checked={this.state.report === "9"}
+                onChange={this.onRadioChange}
+              />
+              <span>7. Stig Benchmark By Results</span>
+            </label>
             <br /><br />
             {showEmassNum && (
               <div id='emassDiv'>
