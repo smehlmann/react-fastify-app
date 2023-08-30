@@ -4,7 +4,7 @@ import promptSync from 'prompt-sync';
 import { stringify } from 'csv-stringify/sync';
 import fs from 'fs';
 
-async function runAssetCountReport(tokens, args) {
+async function runAssetCountReport(myTokenUtils, args) {
 
     try {
 
@@ -15,7 +15,7 @@ async function runAssetCountReport(tokens, args) {
         var collections = [];
         var tempCollections = [];
 
-        tempCollections = await reportGetters.getCollections(tokens.access_token);
+        tempCollections = await reportGetters.getCollections(myTokenUtils.getMyTokens().access_token);
         if (!args || args.length === 0) {
             collections = tempCollections;
         }
@@ -44,7 +44,7 @@ async function runAssetCountReport(tokens, args) {
             var collectionName = collections[i].name;
 
             metrics.length = 0;
-            metrics = await reportGetters.getCollectionMertics(tokens.access_token, collections[i].collectionId);
+            metrics = await reportGetters.getCollectionMertics(myTokenUtils.getMyTokens().access_token, collections[i].collectionId);
 
             var myData = getRow(collectionName, metrics);
             rows.push(myData);

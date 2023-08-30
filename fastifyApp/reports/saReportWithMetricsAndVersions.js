@@ -5,7 +5,7 @@ import * as reportUtils from './reportUtils.js';
 //import fs from 'fs';
 //import path from 'path'
 
-async function runSAReportWithMetricsAndVersions(tokens, args) {
+async function runSAReportWithMetricsAndVersions(myTokenUtils, args) {
 
     try {
 
@@ -16,7 +16,7 @@ async function runSAReportWithMetricsAndVersions(tokens, args) {
         var collections = [];
         var tempCollections = [];
 
-        tempCollections = await reportGetters.getCollections(tokens.access_token);
+        tempCollections = await reportGetters.getCollections(myTokenUtils.getMyTokens().access_token);
         if (!args || args.length === 0) {
             collections = tempCollections;
         }
@@ -63,28 +63,32 @@ async function runSAReportWithMetricsAndVersions(tokens, args) {
 
         for (var i = 0; i < collections.length; i++) {
             var collectionName = collections[i].name;
-            console.log(collectionName);
+            console.log('collection name: ' + collectionName);
             labelMap.clear();
             labels.length = 0;
             if(collectionName.toUpperCase() === "HAPPY CORP"){
                 continue;
             }
-            labels = await reportGetters.getLabelsByCollection(tokens.access_token, collections[i].collectionId);
+            labels = await reportGetters.getLabelsByCollection(myTokenUtils.getMyTokens().access_token, collections[i].collectionId);
             for (var x = 0; x < labels.length; x++) {
                 labelMap.set(labels[x].labelId, labels[x].description);
             }
 
 
-            metrics = await reportGetters.getCollectionMerticsAggreatedByAsset(tokens.access_token, collections[i].collectionId);
-            //console.log(metrics);
+            metrics = await reportGetters.getCollectionMerticsAggreatedByAsset(myTokenUtils.getMyTokens().access_token, collections[i].collectionId);
+            console.log('num metrics: ' + metrics.length);
 
             for (var j = 0; j < metrics.length; j++) {
 
                 var benchmarkIDs = metrics[j].benchmarkIds;
+                console.log('num benchmarks: ' + benchmarkIDs.length);
+                
                 for (var idx = 0; idx < benchmarkIDs.length; idx++) {
 
+                    console.log('benchmarkId: ' +  benchmarkIDs[idx]);
+
                     var revisions = await reportGetters.getBenchmarkRevisions(
-                        tokens.access_token,
+                        myTokenUtils.getMyTokens().access_token,
                         benchmarkIDs[idx]);
 
                     var latestRev = '';

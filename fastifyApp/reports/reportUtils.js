@@ -21,28 +21,35 @@ var quarters = [
     }
 ];
 
+
 function getCollectionsByEmassNumber(collections) {
 
     let emassMap = new Map();
 
-    for (var x = 0; x < collections.length; x++) {
-        var idx = collections[x].name.search("_[0-9]{1,}_");
-        if (idx >= 0) {
-            var emassNum = collections[x].name.substring(idx);
-            emassNum = emassNum.replace('_', '');
-            idx = emassNum.search("_");
-            emassNum = emassNum.substring(0, idx);
-            //console.log('collection name: ' + collections[x].name + ' EMMAS: ' + emassNum);
-            var myVal = emassMap.get(emassNum);
-            if (myVal) {
-                myVal.push(collections[x]);
-                emassMap.set(emassNum, myVal);
-            }
-            else {
-                myVal = [collections[x]];
-                emassMap.set(emassNum, myVal);
+    try {
+        for (var x = 0; x < collections.length; x++) {
+            var idx = collections[x].name.search("_[0-9]{1,}_");
+            if (idx >= 0) {
+                var emassNum = collections[x].name.substring(idx);
+                emassNum = emassNum.replace('_', '');
+                idx = emassNum.search("_");
+                emassNum = emassNum.substring(0, idx);
+                //console.log('collection name: ' + collections[x].name + ' EMMAS: ' + emassNum);
+                var myVal = emassMap.get(emassNum);
+                if (myVal) {
+                    myVal.push(collections[x]);
+                    emassMap.set(emassNum, myVal);
+                }
+                else {
+                    myVal = [collections[x]];
+                    emassMap.set(emassNum, myVal);
+                }
             }
         }
+    }
+    catch (e) {
+        console.log('Error in getCollectionsByEmassNumber');
+        console.log(e);
     }
 
     return emassMap;
@@ -140,9 +147,43 @@ function getEmassAcronymMap() {
     return emassAcronymMap;
 }
 
+function getMetricsAverages(metrics) {
+
+    const numAssessments = metrics.metrics.assessments;
+    const numAssessed = metrics.metrics.assessed;
+    const numSubmitted = metrics.metrics.statuses.submitted;
+    const numAccepted = metrics.metrics.statuses.accepted;
+    const numRejected = metrics.metrics.statuses.rejected;
+    const numSaved = metrics.metrics.statuses.rejected;
+    const numAssets = metrics.assets;
+
+    const avgAssessed = numAssessments ? (numAssessed / numAssessments) * 100 : 0;
+    //const avgAssessed = Math.round(numAssessments ? (numAssessed / numAssessments) * 100 : 0);
+
+    const avgSubmitted = numAssessments ? ((numSubmitted + numAccepted + numRejected) / numAssessments) * 100 : 0;
+    //const avgSubmitted = Math.round(numAssessments ? ((numSubmitted + numAccepted + numRejected) / numAssessments) * 100 : 0);
+
+    const avgAccepted = numAssessments ? ((numAccepted) / numAssessments) * 100 : 0;
+    //const avgAccepted = Math.round(numAssessments ? ((numAccepted) / numAssessments) * 100 : 0);
+
+    const avgRejected = numAssessments ? ((numRejected) / numAssessments) * 100 : 0;
+   
+    //const avgRejected = Math.round(numAssessments ? ((numRejected) / numAssessments) * 100 : 0);
+
+    var averages = {
+        assessed: avgAssessed,
+        submitted: avgSubmitted,
+        accepted: avgAccepted,
+        rejected: avgRejected
+    }
+
+    return averages;
+}
+
 export {
     getCollectionsByEmassNumber,
     getCurrentQuarter,
     getVersionForQuarter,
-    getEmassAcronymMap
+    getEmassAcronymMap,
+    getMetricsAverages
 };

@@ -6,7 +6,7 @@ import * as reportUtils from './reportUtils.js';
 //import fs from 'fs';
 //import path from 'path'
 
-async function runSAReportByLabelAndEmass(tokens, args) {
+async function runSAReportByLabelAndEmass(myTokenUtils, args) {
 
     try {
 
@@ -15,7 +15,7 @@ async function runSAReportByLabelAndEmass(tokens, args) {
         var collections = [];
         var tempCollections = [];
 
-        tempCollections = await reportGetters.getCollections(tokens.access_token);
+        tempCollections = await reportGetters.getCollections(myTokenUtils.getMyTokens().access_token);
         if (!args || args.length === 0) {
             collections = tempCollections;
         }
@@ -71,7 +71,7 @@ async function runSAReportByLabelAndEmass(tokens, args) {
 
                 if (!containsStr) {
                     metrics = await reportGetters.getCollectionMerticsAggreatedByLabel(
-                        tokens.access_token, myCollections[i].collectionId);
+                        myTokenUtils.getMyTokens().access_token, myCollections[i].collectionId);
                     //console.log(metrics);
                     metricsData.push(metrics);
                 }

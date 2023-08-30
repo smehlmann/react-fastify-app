@@ -5,7 +5,7 @@ import { stringify } from 'csv-stringify/sync';
 import fs from 'fs';
 import path from 'path'
 
-async function runSAReport(tokens, args) {
+async function runSAReport(myTokenUtils, args) {
 
     try {
 
@@ -18,7 +18,7 @@ async function runSAReport(tokens, args) {
         var collections = [];
         var tempCollections = [];
 
-        tempCollections = await reportGetters.getCollections(tokens.access_token);
+        tempCollections = await reportGetters.getCollections(myTokenUtils.getMyTokens().access_token);
         if (!args || args.length === 0) {
             collections = tempCollections;
         }
@@ -69,7 +69,7 @@ async function runSAReport(tokens, args) {
                 labelMap.set(labels[x].labelId, labels[x].description);
             }*/
 
-            metrics = await reportGetters.getCollectionMertics(tokens.access_token, collections[i].collectionId);
+            metrics = await reportGetters.getCollectionMertics(myTokenUtils.getMyTokens().access_token, collections[i].collectionId);
             //console.log(metrics);
             //console.log(metrics.length);
             var myData = getRow(collectionName, metrics);

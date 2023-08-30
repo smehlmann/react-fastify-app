@@ -4,7 +4,7 @@ import promptSync from 'prompt-sync';
 import { stringify } from 'csv-stringify/sync';
 import fs from 'fs';
 
-async function runAssetByCollectionReport(tokens, args) {
+async function runAssetByCollectionReport(myTokenUtils, args) {
 
     try {
 
@@ -12,7 +12,7 @@ async function runAssetByCollectionReport(tokens, args) {
         var collections = [];
         var tempCollections = [];
 
-        tempCollections = await reportGetters.getCollections(tokens.access_token);
+        tempCollections = await reportGetters.getCollections(myTokenUtils.getMyTokens().access_token);
         if (!args || args.length === 0) {
             collections = tempCollections;
         }
@@ -61,13 +61,13 @@ async function runAssetByCollectionReport(tokens, args) {
                 var collectionName = myCollections[i].name;
                 var strToRemove = '_' + emassNum + '_';
                 collectionName = collectionName.replace(strToRemove, '');
-                stigs = await reportGetters.getStigs(tokens.access_token, myCollections[i].collectionId);
+                stigs = await reportGetters.getStigs(myTokenUtils.getMyTokens().access_token, myCollections[i].collectionId);
                 //console.log(stigs)
 
                 //console.log("Requesting assets")
                 for (var k = 0; k < stigs.length; k++) {
                     assets.length = 0;
-                    assets = await reportGetters.getAssets(tokens.access_token, myCollections[i].collectionId, stigs[k].benchmarkId)
+                    assets = await reportGetters.getAssets(myTokenUtils.getMyTokens().access_token, myCollections[i].collectionId, stigs[k].benchmarkId)
                     //console.log(assets)
 
                     var myData = getRow(emassNum, collectionName, stigs[k], assets)
@@ -89,8 +89,7 @@ function getRow(emassNum, collectionName, stigs, assets) {
 
     var assetNames = ''
     var benchmarkId = stigs.benchmarkId
-    var stigVersion = stigs.revisionStr;
-
+    var stigVersion = stigs.revisionStr
 
     for (var i = 0; i < assets.length; i++) {
         if (i < assets.length - 1) {
