@@ -66,7 +66,7 @@ async function runSAReportWithMetricsAndVersions(myTokenUtils, args) {
             console.log('collection name: ' + collectionName);
             labelMap.clear();
             labels.length = 0;
-            if(collectionName.toUpperCase() === "HAPPY CORP"){
+            if (collectionName.toUpperCase() === "HAPPY CORP") {
                 continue;
             }
             labels = await reportGetters.getLabelsByCollection(myTokenUtils.getMyTokens().access_token, collections[i].collectionId);
@@ -82,10 +82,10 @@ async function runSAReportWithMetricsAndVersions(myTokenUtils, args) {
 
                 var benchmarkIDs = metrics[j].benchmarkIds;
                 console.log('num benchmarks: ' + benchmarkIDs.length);
-                
+
                 for (var idx = 0; idx < benchmarkIDs.length; idx++) {
 
-                    console.log('benchmarkId: ' +  benchmarkIDs[idx]);
+                    console.log('benchmarkId: ' + benchmarkIDs[idx]);
 
                     var revisions = await reportGetters.getBenchmarkRevisions(
                         myTokenUtils.getMyTokens().access_token,
@@ -95,14 +95,16 @@ async function runSAReportWithMetricsAndVersions(myTokenUtils, args) {
                     var prevRev = '';
                     var latestRevDate = '';
                     var prevRevDate = '';
-                    for (var bmIdx = 0; bmIdx < revisions.length && bmIdx < 2; bmIdx++) {
-                        if (bmIdx === 0) {
-                            latestRev = revisions[bmIdx].revisionStr;
-                            latestRevDate = revisions[bmIdx].benchmarkDate;
-                        }
-                        else if (bmIdx === 1) {
-                            prevRev = revisions[bmIdx].revisionStr;
-                            prevRevDate = revisions[bmIdx].benchmarkDate;
+                    if (revisions) {
+                        for (var bmIdx = 0; bmIdx < revisions.length && bmIdx < 2; bmIdx++) {
+                            if (bmIdx === 0) {
+                                latestRev = revisions[bmIdx].revisionStr;
+                                latestRevDate = revisions[bmIdx].benchmarkDate;
+                            }
+                            else if (bmIdx === 1) {
+                                prevRev = revisions[bmIdx].revisionStr;
+                                prevRevDate = revisions[bmIdx].benchmarkDate;
+                            }
                         }
                     }
 
@@ -115,7 +117,7 @@ async function runSAReportWithMetricsAndVersions(myTokenUtils, args) {
                         prevRev,
                         benchmarkIDs[idx],
                         currentQuarter);
-                        
+
                     rows.push(myData);
 
                 }
@@ -158,7 +160,7 @@ function getRow(collectionName,
 
         if (labelDesc) {
             if (labelDesc.toUpperCase() === 'PRIMARY OWNER') {
-                    primOwner = metrics.labels[iLabel].name;
+                primOwner = metrics.labels[iLabel].name;
             }
             else if (labelDesc.toUpperCase() === 'SYS ADMIN') {
                 sysAdmin = metrics.labels[iLabel].name;
