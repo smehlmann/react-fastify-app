@@ -107,6 +107,13 @@ async function runSAReportWithMetricsAndVersions(myTokenUtils, args) {
                             }
                         }
                     }
+                    else {
+                        var stig = await reportGetters.getStigById(myTokenUtils.getMyTokens().access_token,
+                            benchmarkIDs[idx]);
+
+                        latestRev = stig.lastRevisionStr;
+                        latestRevDate = stig.lastRevisionDate;
+                    }
 
                     var myData = getRow(
                         collectionName,
