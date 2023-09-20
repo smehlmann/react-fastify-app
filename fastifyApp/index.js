@@ -9,6 +9,7 @@ import * as statusReport from './reports/statusReport.js';
 import * as assetCountReport from './reports/assetCountReport.js';
 import * as saReport from './reports/saReport.js';
 import * as saReportByAsset from './reports/saReportByAsset.js';
+import * as exportSaReportByAsset from './reports/exportSaReportByAsset.js';
 import * as assetCountReportByEmass from './reports/assetCountReportByEmass.js';
 import * as saReportByLabelAndEmass from './reports/saReportByLabelAndEmass.js';
 import * as assetsByCollectionsReport from './reports/assetsByCollectionsReport.js';
@@ -168,6 +169,13 @@ async function run(selection, emassNums) {
       console.log('Run STIG Benchmark by Results');
       let tokens = await myTokenUtils.getTokens(oidcBase, client_id, scope);
       rows = await stigBenchmarkByResults.runStigBenchmarkByResults(myTokenUtils, emassNums,);
+      return rows;
+    }
+    else if (selection == 10) {
+      // run STIG Benchmark by Results
+      console.log('Run Export SA Report by Asset');
+      let tokens = await myTokenUtils.getTokens(oidcBase, client_id, scope);
+      rows = await exportSaReportByAsset.runExportSAReportByAsset(myTokenUtils, emassNums,);
       return rows;
     }
     else if (selection == 102) {
