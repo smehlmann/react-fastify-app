@@ -2,22 +2,19 @@ import * as reportGetters from './reportGetters.js';
 import * as reportUtils from './reportUtils.js';
 import { stringify } from 'csv-stringify/sync';
 
-async function runSAReportByAsset(myTokenUtils, args) {
+async function runExportSAReportByAsset(myTokenUtils, args) {
 
     try {
 
         //const prompt = promptSync();
         //const collectionName = prompt('Enter collection name.');
 
-        console.log(`runStatusReport: Requesting STIG Manager Collections`);
+        console.log(`runExportSAReportByAsset: Requesting STIG Manager Collections`);
         //console.log(`runStatusReport: Requesting STIG Manager Data for collection ` + collectionName);
         var collections = [];
         var tempCollections = [];
 
-        tempCollections = await reportGetters.getCollections(myTokenUtils.getMyTokens()
-
-
-            .access_token);
+        tempCollections = await reportGetters.getCollections(myTokenUtils.getMyTokens().access_token);
         if (!args || args.length === 0) {
             collections = tempCollections;
         }
@@ -53,14 +50,10 @@ async function runSAReportByAsset(myTokenUtils, args) {
                 deviveType: 'Device-Asset',
                 lastTouched: 'Last Touched',
                 stigs: 'STIGs',
-                benchmarks: 'Benchmarks',
                 assessed: 'Assessed',
                 submitted: 'Submitted',
                 accepted: 'Accepted',
-                rejected: 'Rejected',
-                cat3: 'CAT3',
-                cat2: 'CAT2',
-                cat1: 'CAT1'
+                rejected: 'Rejected'
             }
         ];
 
@@ -70,7 +63,17 @@ async function runSAReportByAsset(myTokenUtils, args) {
         for (var i = 0; i < collections.length; i++) {
             var collectionName = collections[i].name;
 
-            if (!collectionName.startsWith('NP_C')) {
+            var upperCaseName = collectionName.toUpperCase();
+
+            //exclude collections thqt do not start with NP_C
+            if (!upperCaseName.startsWith('NP_C')) {
+                continue;
+            }
+            // exclude collections that include _NON_STIG or PL/
+            if(upperCaseName.includes('_NON_STIG_') || 
+            upperCaseName.includes('_NON-STIG_') || 
+            upperCaseName.includes('_NON STIG') ||
+            upperCaseName.includes('PL_')){
                 continue;
             }
 
@@ -173,10 +176,6 @@ function getRow(todayStr, collectionName, metrics, labelMap) {
     const avgAccepted = Math.round(numAssessments ? ((numAccepted) / numAssessments) * 100 : 0);
     const avgRejected = Math.round(numAssessments ? ((numRejected) / numAssessments) * 100 : 0);
 
-    const sumOfCat3 = metrics.metrics.findings.low;
-    const sumOfCat2 = metrics.metrics.findings.medium;
-    const sumOfCat1 = metrics.metrics.findings.high;
-
     var benchmarkIDs = metrics.benchmarkIds.toString();
     benchmarkIDs = benchmarkIDs.replaceAll(",", " ");
 
@@ -237,18 +236,14 @@ function getRow(todayStr, collectionName, metrics, labelMap) {
         deviveType: device,
         lastTouched: lastTouched,
         stigs: metrics.benchmarkIds.length,
-        benchmarks: benchmarkIDs,
         assessed: avgAssessed + '%',
         submitted: avgSubmitted + '%',
         accepted: avgAccepted + '%',
-        rejected: avgRejected + '%',
-        cat3: sumOfCat3,
-        cat2: sumOfCat2,
-        cat1: sumOfCat1
+        rejected: avgRejected + '%'
     }
 
     return rowData;
 
 }
 
-export { runSAReportByAsset };
+export { runExportSAReportByAsset };

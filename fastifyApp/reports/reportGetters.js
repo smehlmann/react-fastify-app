@@ -115,6 +115,13 @@ async function getStigs(accessToken, collectionId) {
   return stigs
 }
 
+async function getStigById(accessToken, benchmarkId) {
+  //console.log('inGetStigs')
+  var myUrl = apiBase + '/stigs/' + benchmarkId ;
+  var stig = getMetricsData(accessToken, myUrl)
+  return stig
+}
+
 async function getStigsByAsset(accessToken, assetId) {
 
   try {
@@ -780,6 +787,7 @@ export {
   getCollections,
   getCollectionByName,
   getStigs,
+  getStigById,
   getStigsByAsset,
   getAssets,
   getAssetsByLabel,
