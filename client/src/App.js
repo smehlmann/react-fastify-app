@@ -237,7 +237,17 @@ class App extends Component {
                 checked={this.state.report === "9"}
                 onChange={this.onRadioChange}
               />
-              <span>7. Stig Benchmark By Results</span>
+              <span>8. Stig Benchmark By Results</span>
+            </label>
+            <br />
+            <label>
+              <input
+                type="radio"
+                value="10"
+                checked={this.state.report === "10"}
+                onChange={this.onRadioChange}
+              />
+              <span>9. Export Asset Collection per Primary Owner and System Admin</span>
             </label>
             <br /><br />
             {showEmassNum && (
