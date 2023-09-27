@@ -28,7 +28,23 @@ function getCollectionsByEmassNumber(collections) {
 
     try {
         for (var x = 0; x < collections.length; x++) {
-            var idx = collections[x].name.search("_[0-9]{1,}_");
+
+            var emassNum = collections[x].metadata.eMASS;
+            if (emassNum) {
+
+                var myVal = emassMap.get(emassNum);
+                if (myVal) {
+                    myVal.push(collections[x]);
+                    emassMap.set(emassNum, myVal);
+                }
+                else {
+                    myVal = [collections[x]];
+                    emassMap.set(emassNum, myVal);
+                }
+            }
+
+            /*var idx = collections[x].name.search("_[0-9]{1,}_");
+
             if (idx >= 0) {
                 var emassNum = collections[x].name.substring(idx);
                 emassNum = emassNum.replace('_', '');
@@ -44,7 +60,7 @@ function getCollectionsByEmassNumber(collections) {
                     myVal = [collections[x]];
                     emassMap.set(emassNum, myVal);
                 }
-            }
+            }*/
         }
     }
     catch (e) {
@@ -167,7 +183,7 @@ function getMetricsAverages(metrics) {
     //const avgAccepted = Math.round(numAssessments ? ((numAccepted) / numAssessments) * 100 : 0);
 
     const avgRejected = numAssessments ? ((numRejected) / numAssessments) * 100 : 0;
-   
+
     //const avgRejected = Math.round(numAssessments ? ((numRejected) / numAssessments) * 100 : 0);
 
     var averages = {

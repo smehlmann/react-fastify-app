@@ -64,16 +64,30 @@ async function runExportSAReportByAsset(myTokenUtils, args) {
             var collectionName = collections[i].name;
 
             var upperCaseName = collectionName.toUpperCase();
+            /*if (upperCaseName.includes('ASI_NON')) {
+                console.log(upperCaseName);
+            }
+            if (upperCaseName.includes('PL_')) {
+                console.log(upperCaseName);
+            }*/
 
             //exclude collections thqt do not start with NP_C
             if (!upperCaseName.startsWith('NP_C')) {
                 continue;
             }
-            // exclude collections that include _NON_STIG or PL/
-            if(upperCaseName.includes('_NON_STIG_') || 
-            upperCaseName.includes('_NON-STIG_') || 
-            upperCaseName.includes('_NON STIG') ||
-            upperCaseName.includes('PL_')){
+            /*// exclude collections that include _NON_STIG or PL/
+            if (upperCaseName.includes('_NON_STIG_') ||
+                upperCaseName.includes('_NON-STIG_') ||
+                upperCaseName.includes('_NON STIG') ||
+                upperCaseName.includes('PL_')) {
+                continue;
+            }*/
+
+
+            if (collections[i].metadata.NonStig) {
+                continue;
+            }
+            else if (collections[i].metadata.ParkingLot) {
                 continue;
             }
 
@@ -81,9 +95,7 @@ async function runExportSAReportByAsset(myTokenUtils, args) {
             //console.log(collectionName);
             labelMap.clear();
             labels.length = 0;
-            if (collectionName.toUpperCase() === 'HAPPY CORP') {
-                continue;
-            }
+
             labels = await reportGetters.getLabelsByCollection(myTokenUtils.getMyTokens().access_token, collections[i].collectionId);
             for (var x = 0; x < labels.length; x++) {
                 labelMap.set(labels[x].labelId, labels[x].description);
@@ -94,7 +106,7 @@ async function runExportSAReportByAsset(myTokenUtils, args) {
             //console.log(metrics);
 
             for (var j = 0; j < metrics.length; j++) {
-                var myData = getRow(todayStr, collectionName, metrics[j], labelMap);
+                var myData = getRow(todayStr, collections[i], metrics[j], labelMap);
                 rows.push(myData);
 
             }
@@ -107,7 +119,11 @@ async function runExportSAReportByAsset(myTokenUtils, args) {
     return rows;
 }
 
-function getRow(todayStr, collectionName, metrics, labelMap) {
+function getRow(todayStr, collection, metrics, labelMap) {
+
+    var collectionName = collection.name;
+    var code = collection.metadata.Code;
+    var shortName = collection.metadata.ShortName;
 
     const numAssessments = metrics.metrics.assessments;
     const numAssessed = metrics.metrics.assessed;
@@ -179,19 +195,19 @@ function getRow(todayStr, collectionName, metrics, labelMap) {
     var benchmarkIDs = metrics.benchmarkIds.toString();
     benchmarkIDs = benchmarkIDs.replaceAll(",", " ");
 
-    var nameLen = collectionName.length;
-    var tmpCode = collectionName.substring(4, nameLen - 1);
-    var code = tmpCode.match(/\d+/)[0];
-    var codeLen = code.length;
-    var codeIdx = collectionName.indexOf(code);
-    var nextIdx = codeIdx + codeLen + 1 // skip over the space or hyphen;
-    var tmpName = collectionName.substring(nextIdx, nameLen);
-    tmpName = tmpName.trim();
-    if (tmpName.includes('ASI_NON')) {
-        console.log('tmpName: ' + tmpName);
-    }
+    /* var nameLen = collectionName.length;
+     var tmpCode = collectionName.substring(4, nameLen - 1);
+     var code = tmpCode.match(/\d+/)[0];
+     var codeLen = code.length;
+     var codeIdx = collectionName.indexOf(code);
+     var nextIdx = codeIdx + codeLen + 1 // skip over the space or hyphen;
+     var tmpName = collectionName.substring(nextIdx, nameLen);
+     tmpName = tmpName.trim();
+     if (tmpName.includes('ASI_NON')) {
+         console.log('tmpName: ' + tmpName);
+     }*/
 
-    var tmpShortName1 = tmpName.split(' ')[0];
+    /*var tmpShortName1 = tmpName.split(' ')[0];
     var tmpShortName2 = tmpName.split('-')[0];
     var tmpShortName3 = tmpName.split('_')[0];
     var shortName = '';
@@ -205,11 +221,11 @@ function getRow(todayStr, collectionName, metrics, labelMap) {
     }
     else {
         shortName = tmpShortName3;
-    }
+    }*/
 
     //console.log('shortName: ' + shortName + ' name1: ' + tmpShortName1 + ' name2: ' + tmpShortName2 + ' name3: ' + tmpShortName3);
 
-    tmpShortName1 = shortName.split(' ')[0];
+    /*tmpShortName1 = shortName.split(' ')[0];
     tmpShortName2 = shortName.split('-')[0];
     tmpShortName3 = shortName.split('_')[0];
     if (tmpShortName1 != tmpName) {
@@ -220,7 +236,7 @@ function getRow(todayStr, collectionName, metrics, labelMap) {
     }
     else {
         shortName = tmpShortName3;
-    }
+    }*/
 
 
     //console.log('name1: ' + tmpShortName1 + ' name2: ' + tmpShortName2 + ' name3: ' + tmpShortName3);

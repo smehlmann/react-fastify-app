@@ -91,7 +91,7 @@ async function runSAReportByAsset(myTokenUtils, args) {
             //console.log(metrics);
 
             for (var j = 0; j < metrics.length; j++) {
-                var myData = getRow(todayStr, collectionName, metrics[j], labelMap);
+                var myData = getRow(todayStr, collections[i], metrics[j], labelMap);
                 rows.push(myData);
 
             }
@@ -104,7 +104,11 @@ async function runSAReportByAsset(myTokenUtils, args) {
     return rows;
 }
 
-function getRow(todayStr, collectionName, metrics, labelMap) {
+function getRow(todayStr, collection, metrics, labelMap) {
+
+    var collectionName = collection.name;
+    var code = collection.metadata.Code;
+    var shortName = collection.metadata.ShortName;
 
     const numAssessments = metrics.metrics.assessments;
     const numAssessed = metrics.metrics.assessed;
@@ -180,7 +184,7 @@ function getRow(todayStr, collectionName, metrics, labelMap) {
     var benchmarkIDs = metrics.benchmarkIds.toString();
     benchmarkIDs = benchmarkIDs.replaceAll(",", " ");
 
-    var nameLen = collectionName.length;
+    /*var nameLen = collectionName.length;
     var tmpCode = collectionName.substring(4, nameLen - 1);
     var code = tmpCode.match(/\d+/)[0];
     var codeLen = code.length;
@@ -206,11 +210,11 @@ function getRow(todayStr, collectionName, metrics, labelMap) {
     }
     else {
         shortName = tmpShortName3;
-    }
+    }*/
 
     //console.log('shortName: ' + shortName + ' name1: ' + tmpShortName1 + ' name2: ' + tmpShortName2 + ' name3: ' + tmpShortName3);
 
-    tmpShortName1 = shortName.split(' ')[0];
+    /*tmpShortName1 = shortName.split(' ')[0];
     tmpShortName2 = shortName.split('-')[0];
     tmpShortName3 = shortName.split('_')[0];
     if (tmpShortName1 != tmpName) {
@@ -221,7 +225,7 @@ function getRow(todayStr, collectionName, metrics, labelMap) {
     }
     else {
         shortName = tmpShortName3;
-    }
+    }*/
 
 
     //console.log('name1: ' + tmpShortName1 + ' name2: ' + tmpShortName2 + ' name3: ' + tmpShortName3);
