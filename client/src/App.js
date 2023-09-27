@@ -217,7 +217,7 @@ class App extends Component {
                 checked={this.state.report === "7"}
                 onChange={this.onRadioChange}
               />
-              <span>5. </span>Asset Status per eMASS
+              <span>5. Asset Status per eMASS</span>
             </label>
             <br />
             <label>
@@ -237,7 +237,7 @@ class App extends Component {
                 checked={this.state.report === "9"}
                 onChange={this.onRadioChange}
               />
-              <span>8. Stig Benchmark By Results</span>
+              <span>7. Stig Benchmark By Results</span>
             </label>
             <br />
             <label>
@@ -247,7 +247,7 @@ class App extends Component {
                 checked={this.state.report === "10"}
                 onChange={this.onRadioChange}
               />
-              <span>9. Export Asset Collection per Primary Owner and System Admin</span>
+              <span>8. Export Asset Collection per Primary Owner and System Admin</span>
             </label>
             <br /><br />
             {showEmassNum && (
