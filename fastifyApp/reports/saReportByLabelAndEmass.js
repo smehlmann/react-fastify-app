@@ -128,10 +128,26 @@ function getRow(emassNum, metrics, acronymMap) {
     const numUnassessed = numAssessments - numAssessed;
     const totalChecks = numAssessments;
 
-    const avgAssessed = Math.round(numAssessments ? (numAssessed / numAssessments) * 100 : 0);
-    const avgSubmitted = Math.round(numAssessments ? ((numSubmitted + numAccepted + numRejected) / numAssessments) * 100 : 0);
-    const avgAccepted = Math.round(numAssessments ? ((numAccepted) / numAssessments) * 100 : 0);
-    const avgRejected = Math.round(numAssessments ? ((numRejected) / numAssessments) * 100 : 0);
+    var avgAssessed = 0;
+    var avgSubmitted = 0;
+    var avgAccepted = 0;
+    var avgRejected = 0;
+    var temp = 0;
+
+    if (numAssessments) {
+        temp = (numAssessed / numAssessments) * 100;
+        avgAssessed = temp.toFixed(2);
+
+        temp = ((numSubmitted + numAccepted + numRejected) / numAssessments) * 100;
+        avgSubmitted = temp.toFixed(2);
+
+        temp = (numAccepted / numAssessments) * 100;
+        avgAccepted = temp.toFixed(2);
+
+        temp = (numRejected / numAssessments) * 100;
+        avgRejected = temp.toFixed(2);
+
+    }
 
     var emassAcronym = acronymMap.get(emassNum);
     if (!emassAcronym ) {
