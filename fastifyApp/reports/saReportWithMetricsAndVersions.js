@@ -63,7 +63,7 @@ async function runSAReportWithMetricsAndVersions(myTokenUtils, args) {
 
         for (var i = 0; i < collections.length; i++) {
             var collectionName = collections[i].name;
-            console.log('collection name: ' + collectionName);
+            console.log(i + 'collection name: ' + collectionName);
             labelMap.clear();
             labels.length = 0;
             if (collectionName.toUpperCase() === "HAPPY CORP") {
@@ -130,12 +130,13 @@ async function runSAReportWithMetricsAndVersions(myTokenUtils, args) {
                 }
             }
         }
+
+        return rows;
     }
     catch (e) {
-        console.log(e)
-    }
-
-    return rows;
+        console.log(e);
+        throw(e);
+    } 
 }
 
 function getRow(collectionName,

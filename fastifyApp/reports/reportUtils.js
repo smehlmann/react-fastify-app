@@ -196,10 +196,55 @@ function getMetricsAverages(metrics) {
     return averages;
 }
 
+function calcDiffInDays(minTs){
+
+    var touchDate = new Date(minTs);
+    var today = new Date();
+    var timeDiff = today - touchDate;
+    var diffInDays = timeDiff / (1000 * 3600 * 24);
+
+    return diffInDays
+}
+
+
+function resultAbbreviation(result) {
+
+    var abbrev = '';
+
+    if(!result || result === 'null' || result === 'undefined'){
+        return abbrev;
+    }
+
+    switch (result) {
+        case 'notchecked':
+            abbrev = 'NR+';
+            break;
+        case 'notapplicable':
+            abbrev = 'NA';
+            break;
+        case 'pass':
+            abbrev = 'NF';
+            break;
+        case 'fail':
+            abbrev = 'O';
+            break;
+        case 'informational':
+            abbrev = 'I';
+            break;
+        default:
+            abbrev = 'NR+';
+            break;
+    }
+
+    return abbrev;
+}
+
 export {
     getCollectionsByEmassNumber,
     getCurrentQuarter,
     getVersionForQuarter,
     getEmassAcronymMap,
-    getMetricsAverages
+    getMetricsAverages,
+    calcDiffInDays,
+    resultAbbreviation
 };

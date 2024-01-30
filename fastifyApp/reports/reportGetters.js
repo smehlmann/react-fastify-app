@@ -281,6 +281,14 @@ async function getCollectionMerticsdByStig(accessToken, collectionId) {
 
 }
 
+function getMetricsSummaryByCollectionAndBenchmark(accessToken, collectionId, benchmarkId){
+
+  var myUrl = apiBase + '/collections/' + collectionId + '/metrics/summary/stig?benchmarkId=' + benchmarkId + '&format=json';
+  var metrics = getMetricsData(accessToken, myUrl);
+  return metrics;
+
+}
+
 async function getLabelsByCollection(accessToken, collectionId) {
 
   var myUrl = apiBase + '/collections/' + collectionId + '/labels';
@@ -820,5 +828,6 @@ export {
   getAllReviewsByCollectionAndAsset,
   getReviewByGroupId,
   getSubmittedReviewsByCollectionAndAsset,
-  setDeviceCode
+  setDeviceCode,
+  getMetricsSummaryByCollectionAndBenchmark
 };
