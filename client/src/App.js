@@ -249,6 +249,16 @@ class App extends Component {
               />
               <span>8. Export Asset Collection per Primary Owner and System Admin</span>
             </label>
+            <br />
+            <label>
+              <input
+                type="radio"
+                value="11"
+                checked={this.state.report === "11"}
+                onChange={this.onRadioChange}
+              />
+              <span>9. Checklist Over 365 Days</span>
+            </label>
             <br /><br />
             {showEmassNum && (
               <div id='emassDiv'>
