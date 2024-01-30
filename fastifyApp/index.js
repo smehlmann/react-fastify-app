@@ -17,6 +17,7 @@ import * as saReportWithMetricsAndVersions from './reports/saReportWithMetricsAn
 import * as stigBenchmarkByResults from './reports/stigBenchmarkByResults.js';
 import * as manageLabels from './labelOps/manageLabels.js';
 import * as tokenUtils from './reports/tokenUtils.js';
+import * as checklistOver365Days from './reports/checklistOver365Days.js';
 
 const oidcBase = 'https://stigman.nren.navy.mil/auth/realms/np-stigman'
 const apiBase = 'https://stigman.nren.navy.mil/np/api'
@@ -178,6 +179,13 @@ async function run(selection, emassNums) {
       rows = await exportSaReportByAsset.runExportSAReportByAsset(myTokenUtils, emassNums,);
       return rows;
     }
+    else if (selection == 11) {
+      // run STIG Benchmark by Results
+      console.log('Run Checklist Over 365 Days');
+      let tokens = await myTokenUtils.getTokens(oidcBase, client_id, scope);
+      rows = await checklistOver365Days.runChecklistOver365Days(myTokenUtils, emassNums,);
+      return rows;
+    }
     else if (selection == 102) {
       console.log('Run Delete All Labels');
       let tokens = await myTokenUtils.getTokens(oidcBase, client_id, scope);
@@ -190,6 +198,7 @@ async function run(selection, emassNums) {
   }
   catch (e) {
     console.log(e.message);
+    throw(e);
   }
 }
 
