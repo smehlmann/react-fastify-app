@@ -105,10 +105,16 @@ class App extends Component {
 
   onSubmit = (e) => {
     e.preventDefault();
-    if (this.state.report.length === 0) {
+    if (this.state.report === '') {
       alert('Please select a report to generate.');
       return;
     }
+
+    if ((this.state.report === '11' || this.state.report === '8') && this.state.emassNums === ''){
+      alert('You must enter EMASS number(s)');
+      return;
+    }
+
     console.log(this.state);
     if (this.state.report)
       this.callAPI(this.state.report);
@@ -227,7 +233,7 @@ class App extends Component {
                 checked={this.state.report === "8"}
                 onChange={this.onRadioChange}
               />
-              <span>6. STIG Deltas per Primary Owner and System Admin</span>
+              <span>6. STIG Deltas per Primary Owner and System Admin (EMASS number(s) required)</span>
             </label>
             <br />
             <label>
@@ -257,12 +263,12 @@ class App extends Component {
                 checked={this.state.report === "11"}
                 onChange={this.onRadioChange}
               />
-              <span>9. Checklist Over 365 Days</span>
+              <span>9. Checklist Over 360 Days (EMASS number(s) required)</span>
             </label>
             <br /><br />
             {showEmassNum && (
               <div id='emassDiv'>
-                <label htmlFor="emassNumsText">Optional: Enter EMASS Numbers: </label>
+                <label htmlFor="emassNumsText">Optional except for reports 6 and 9: Enter EMASS Number(s) separated by commas: </label>
                 <input
                   id='emassNumsText'
                   type='text'
