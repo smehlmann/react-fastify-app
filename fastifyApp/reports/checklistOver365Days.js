@@ -91,12 +91,12 @@ async function runChecklistOver365Days(myTokenUtils, args) {
 
             for (var iMetrics = 0; iMetrics < metrics.length; iMetrics++) {
 
-                //var minTs = metrics[iMetrics].metrics.minTs;
-                //var maxTs = metrics[iMetrics].metrics.maxTs;
-                //var diffInDays = reportUtils.calcDiffInDays(minTs);
-                /*if (diffInDays < 365) {
+                var minTs = metrics[iMetrics].metrics.minTs;
+                var maxTs = metrics[iMetrics].metrics.maxTs;
+                var diffInDays = reportUtils.calcDiffInDays(minTs);
+                if (diffInDays < 360) {
                     continue;
-                }*/
+                }
 
                 //var oldest = diffInDays;
                 //var diffInDays = reportUtils.calcDiffInDays(maxTs);
@@ -130,8 +130,8 @@ async function runChecklistOver365Days(myTokenUtils, args) {
                         for (var iReviews = 0; iReviews < reviews.length; iReviews++) {
 
                             var modifiedDate = reviews[iReviews].ts;
-                            var diffInDays = reportUtils.calcDiffInDays(modifiedDate);
-                            if (diffInDays < 365) {
+                            diffInDays = reportUtils.calcDiffInDays(modifiedDate);
+                            if (diffInDays < 360) {
                                 continue;
                             }
                             
